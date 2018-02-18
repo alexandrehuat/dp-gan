@@ -5,13 +5,13 @@
 \usepackage[english,french]{babel}
 	\frenchbsetup{SmallCapsFigTabCaptions=false}
 \usepackage{indentfirst}
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=2cm]{geometry}
 \usepackage[table,kerneldraw,dvipsnames]{xcolor}
 \usepackage{pdflscape}
 \usepackage{rotating}
 
 \usepackage{csquotes}
-\usepackage[natbib=true,backend=biber,style=authoryear,sort=none,sortcites=true,backref=true,backref=false,language=french,autolang=other,url=true,isbn=true,doi=true]{biblatex}
+\usepackage[natbib=true,backend=biber,style=authoryear,sort=none,sortcites=true,backref=true,backref=false,url=true,isbn=true,doi=true]{biblatex}
 \DefineBibliographyExtras{french}{\restorecommand\mkbibnamefamily}
 \addbibresource{ref.bib}
 \AtBeginBibliography{\small}
@@ -97,6 +97,11 @@
 \newcommand{\vs}{\textit{vs.}}
 \newcommand{\cf}{\textit{cf.}}
 \newcommand{\Cf}{\textit{Cf.}}
+\newcommand{\idem}{\textit{idem}}
+\newcommand{\Idem}{\textit{Idem}}
+\newcommand{\ibid}{\textit{ibid}}
+\newcommand{\Ibid}{\textit{Ibid}}
+
 
 % Maths
 
@@ -116,7 +121,7 @@
 % Title
 % --------------------------------------
 
-\title{\textbf{Résumé de l'article « Differentially Private Releasing via Deep Generative Model »}}
+\title{\textbf{Projet d'apprentissage profond}\\« Differentially Private Releasing via Deep Generative Model »}
 \author{\textbf{\AH}\\Master Science des Données\\INSA Rouen Normandie\\\texttt{alexandre.huat@insa-rouen.fr}}
 \date{\today}
 
@@ -130,48 +135,41 @@
 % Body
 % --------------------------------------
 
-% \printbibliography[title=Référence] % ,heading=none
-\vspace{1em}
-{\small\noindent\textbf{Référence :} Zhang, Xinyang, Shouling Ji et Ting Wang (2018). « Differentially Private Releasing via Deep Generative Model ». Version 1. In : ArXiv e-prints. arXiv : \href{http://arxiv.org/abs/1801.01594}{1801.01594 [cs.CR]}.
-\vspace{1em}\hrule}
-\ \\
+\paragraph{Référence}
+% \nocite{*} \printbibliography[title=Référence,heading=none]
+{\small X. Zhang, S. Ji et T. Wang, « Differentially Private Releasing via Deep Generative Model », \textit{ArXiv e-prints}, jan. 2018. arXiv : \href{http://arxiv.org/abs/1801.01594}{\texttt{1801.01594 [cs.CR]}}.}
+\bigskip\hrule
+% \vspace{1em} % \ \\
 
-% \begin{multicols}{2}
-Supposons un groupe de clients et un prestateur de services informatiques collectant et analysant leurs données (\eg\ image, texte, audio). Au cours des tâches d'analyses, le prestateur est amené à traiter des données sensibles. Afin de respecter la vie privée de ses clients, il doit trouver un moyen de traiter efficacement ces données tout en conservant leur confidentialité. C'est à cette problématique que répondent \citet{2018arXiv180101594Z}, via la méta-architecture dp-GAN\footnote{\textit{Differentially Private Generative Adversarial Network}} de l'article résumé ici.
+\begin{multicols}{2}
 
-\begin{figure}[b]
+Supposons un groupe de clients et un prestateur de services informatiques collectant et analysant leurs données (\eg\ classification d'images). Au cours des tâches d'analyses, le prestateur est amené à traiter des données sensibles. Afin de respecter la vie privée de ses clients, il doit trouver un moyen de traiter efficacement ces données tout en conservant leur confidentialité. C'est à cette problématique que répondent Zhang \etal\ par l'architecture dp-GAN de l'article résumé ici.
+
+La \autoref{dp-gan_role} illustre le rôle de dp-GAN, qui est de générer des données synthétiques mais sémantiquement riches, \ie\ suffisamment représentatives des clients, sans violation de leur vie privée.
+En introduction, les auteurs rappellent les défis à relevér en apprentissage sous contrainte de confidentialité et présentent les apports de dp-GAN. En plus de sa cauthoryearcité à générer une infinité de données, dp-GAN garantit l'anonymisation des données réelles par respect du principe de « confidentialité différentielle »\footnote{Synthétiqument, la confidentialité différentielle mesure la cauthoryearcité d'un tiers à déduire des données privées des résultats d'un algorithme ; \cf\ exemple à \url{https://fr.wikipedia.org/wiki/Confidentialité_différentielle#Formalisation}.}.
+Pour ce faire, dp-GAN applique au réseau adverse génératif de Wisserstein (WGAN) amélioré des mécanismes d'anonymisation à l'état de l'art, alors optimisés pour gagner en stabilité et en scalabilité.
+
+En Section 2, Zhang \etal\ font un rappel théorique sur les GAN et justifient leur utilisation du WGAN amélioré par une plus grande stabilité et un plus court temps d'apprentissage que le GAN originel. Ils font également la définition formelle de la confidentialité différentielle et citent des propriétés associées dont bénéficient dp-GAN.
+
+La Section 3 présente dp-GAN dans sa version basique et fournit son algorithme d'apprentissage. Pour assurer sa confidentialité, à chaque mise-à-jour, l'algorithme bruite le gradient du discriminateur (bruitage gaussien et seuillage), à partir duquel un pirate pourrait autrement reconstruire les données privées ; cette technique est communément utilisée dans la littérature. Une preuve théorique du niveau de confidentialité différentielle atteint par l'algorithme est également apportée.
+
+Néanmoins, cette version de dp-GAN souffre de trois inconvénients : elle génère des données de faible qualité ; elle converge moins rapidement que le GAN non-confidentiel, voire diverge ; elle est rigide et n'exploite aucune ressource bonus, \eg\ des données publiques. Pour palier ces défauts, la version avancée de dp-GAN implémente : un regroupement des paramètres du réseau pour un réglage fin et spécifique de leurs bruits respectifs ; un seuillage adaptatif du gradient, qui évolue au cours des itérations ; une initialisation des paramètres du réseau par pré-apprentissage sur les données publiques disponibles. Ces améliorations boostent la vitesse de convergence et la confidentialité de dp-GAN. La Section 4 détaille l'algorithme de  cette version avancée.
+
+S'en suit un rapport d'expériences sur trois bases célèbres et \textit{open source}, étendues à quatre : \fnhref{http://yann.lecun.com/exdb/mnist/}{MNIST}, \fnhref{http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html}{CelebA} et \fnhref{http://lsun.cs.princeton.edu/2015.html}{LSUN}, LSUN étant divisée en deux bases, l'une labellisée (LSUN-L) et l'autre non-labellisée (LSUN-U). Les expériences sont réalisées avec TensorFlow mais le code n'est pas partagé par ses auteurs. Les paramètres testés sont cependant renseignése, entre autres, le ratio données publiques sur données privées est fixé à 2 contre 98 pour chaque. La Section 5 propose ainsi une évaluation qualitative et quantitative des performances du système. De mon point de vue, les images générées par dp-GAN, quelle que soit la base, sont assez vraisemblables ; MNIST en particulier est très bien simulée.
+Dans leur deux premières expériences, Zhang \etal\ comparent quantitativement la qualité des données générées par dp-GAN aux données réelles et à celles générées par le GAN classique non-confidentiel : ses performances sont légèrement moins bonnes pour les données labellisées (plus faible score d'Inception) et non-labellisées (plus grand score de Jensen-Schannon). Dans leur troisième expérience, ils comparent les performances atteintes en classification sur LSUN-L après apprentissage sur les données réelles seules, puis sur les données réelles jointes aux données synthétisées par un GAN non-confidentiel et par dp-GAN. Il en ressort que l'apprentissage avec les données synthétiques de dp-GAN permet une diminution systématique des taux d'erreurs (jusqu'à $-3.3 \%$, contre $-8.7 \%$ pour le GAN non-confidentiel). Quatrièmement, en terme de score d'Inception et de Jensen-Schannon, une ultime expérimentation valide l'efficacité des stratégies optimisations de dp-GAN avancé.
+
+Enfin, les auteurs consacrent une section aux travaux similaires de la littérature. Puis, ils concluent en rappelant l'intérêt et les améliorations apportées par dp-GAN et ouvrent la discussion sur la limite que l'architecture n'a été testée que sur des images ; une évaluation sur d'autres types de données (\eg\ texte) étant bienvenue.
+\end{multicols}
+
+\begin{figure}
     \centering
-    \includegraphics[width=0.67\linewidth]{dp-gan_role.png}
-    \captionof{figure}{La place de dp-GAN dans la chaîne de traitement des données confidentielles. Le « \textit{curator} » est l'entité qui anonymise les données privées pour l'\textit{analyst}.}
+    \includegraphics[width=0.7\textwidth]{dp-gan_role.png}
+    \captionof{figure}{La place de dp-GAN dans la chaîne de traitement des données confidentielles. Le « \textit{curator} » est l'entité qui anonymise les données pour l'\textit{analyst}.}
     \label{dp-gan_role}
 \end{figure}
 
-Le rôle de dp-GAN est de générer des données synthétiques mais sémantiquement riches, \ie\ suffisamment représentatives des clients, qui pourront être utilisées sans violation de leur vie privée (\cf\ \autoref{dp-gan_role}).
-En introduction, les auteurs rappellent les défis à relevér en apprentissage sous contrainte de confidentialité et présentent les apports de dp-GAN. En plus de sa capacité à générer une infinité de données, dp-GAN garantit l'anonymisation des données réelles par respect du principe de « confidentialité différentielle »\footnote{Synthétiqument, la confidentialité différentielle mesure la capacité d'un tiers à déduire des données privées des résultats d'un algorithme ; \cf\ exemple à \url{https://fr.wikipedia.org/wiki/Confidentialité_différentielle#Formalisation}.}.
-% L'algorithme idéal est donc $(0, 0)$-DP, \ie\ les données sensibles sont difficilement reconstructibles via les résultats de l'algorithme qui les traite.
-Pour ce faire, dp-GAN combine le réseau adverse génératif de Wisserstein amélioré (IWGAN) et des mécanismes d'anonymisation à l'état de l'art, alors optimisés pour gagner en stabilité et en scalabilité.
+\paragraph{Implémentation}
+Étant donnée ma formation en apprentissage statistique et profond, le véritable défi de ce projet est l'implémentation de dp-GAN basique. En effet, dp-GAN basique nécessite la compréhension de notions nouvelles (\cf\ Algorithme 1) : le fonctionnement détaillé de WGAN et ce qu'est un « \textit{privacy accountant} ». En revanche, dp-GAN avancé consiste en l'enrichissement de dp-GAN basique par (\cf\ Algorithme 3) : des opérations sur des données publiques identiques à celles réalisées sur les données privées (apprentissage et descente de gradient) et un clustering hiérarchique ascendant des paramètres du réseau.
+Ces opérations ne présentent pas de plus-value pédagogique. Sachant le temps allouable au projet, il apparaît raisonnable de se concentrer sur l'implémentation de dp-GAN basique, testée sur MNIST, CelebA et/ou LSUN.
 
-% \textbf{Définition}\quad{\em Soit un algorithme $\mathscr{A} \colon \mathscr{D} \to \mathscr{R}$ où $\mathscr{D}$ est une base de données et $\mathscr{R}$ un ensemble de résultats. $\mathscr{A}$ est dit \gls{eddp} si pour tous jeux de données adjacents\footnote{qui diffèrent d'un seul élémént} $d, d' \subset \mathscr{D}$ et pour tout sous-ensemble $R \subseteq \mathscr{R}$ : $\mathbb{P}(\mathscr{A}(d) \in R) \le e^\epsilon \mathbb{P}(\mathscr{A}(d') \in R) + \delta$.}
-
-En Section 2, Zhang \etal\ font un rappel théorique sur les GAN et justifient leur utilisation d'un IWGAN par une plus grande stabilité et un plus court temps d'apprentissage que le GAN originel. Ils rappellent également la définition formelle de la confidentialité différentielle et citent des propriétés associées dont bénéficient dp-GAN.
-
-La Section 3 de l'article présente dp-GAN dans sa version basique et fournit son algorithme d'apprentissage. Pour assurer sa confidentialité, à chaque mise-à-jour, l'algorithme bruite le gradient du discriminateur (bruitage gaussien et seuillage), qui pourrait autrement être utilisé par un pirate pour reconstruire les données privées ; cette technique est communément utilisée dans la littérature. Une preuve théorique du niveau de confidentialité différentielle atteint par l'algorithme est également apportée.
-
-Néanmoins, cette version de dp-GAN souffre de trois inconvénients : elle génère des données de faible qualité ; elle converge moins rapidement que l'IWGAN non-confidentiel, voire diverge ; elle est rigide et n'exploite aucune ressource bonus, \eg\ des données publiques. Pour palier ces défauts, la version avancée de dp-GAN implémente : un groupage des paramètres pour un réglage fin et spécifique de leurs bruits respectifs ; un seuillage du gradient qui évolue au cours des itérations ; une initialisation des paramètres du réseau par pré-apprentissage sur les données publiques à disposition. Ces améliorations boostent la vitesse de convergence et la confidentialité de dp-GAN. La Section 4 détaille l'algorithme de  cette version avancée.
-
-S'en suit un rapport d'expériences sur trois bases célèbres et \textit{open source}, étendues à quatre : \fnhref{http://yann.lecun.com/exdb/mnist/}{MNIST}, \fnhref{http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html}{CelebA} et \fnhref{http://lsun.cs.princeton.edu/2015.html}{LSUN}, LSUN étant divisée en deux bases, l'une labellisée (LSUN-L) et l'autre non-labellisée (LSUN-U). Les expériences sont réalisées avec TensorFlow mais le code n'est pas partagé par ses auteurs ; les paramètres testés sont cependant renseignés. La Section 5 propose ainsi une évaluation qualitative et quantitative des performances du système. De mon point de vue, les images générées par dp-GAN, quelque soit la base, sont assez vraisemblables ; MNIST en particulier est très bien representée mais il subsiste un léger bruit de pixels isolés sur chaque image. L'évaluation quantitative, quant à elle, repose sur deux métriques statistiques. D'une part, le score \textit{Inception}, pour les données labellisées, défini par :
-\begin{equation}
-    \label{incep}
-    \mathrm{Inc}(G) = \exp(\mathbb{E}_{x \sim G(z)}[\mathrm{KL}(\mathbb{P}(y \mid x)\,\Vert\, \mathbb{P}(y))])
-\end{equation}
-où G est un générateur.
-D'autre part, le score de Jensen-Schannon, pour les données non-labellisées, défini par :
-\begin{equation}
-    \label{jens}
-    \mathrm{JS}(G) = \frac{1}{2} \mathrm{KL}(\mathbb{P}(y \mid x)\,\Vert\,\mathscr{B}_p)
-    + \frac{1}{2} \mathrm{KL}(\mathscr{B}_p\,\Vert\,\mathbb{P}(y \mid x))
-\end{equation}
-où $\mathscr{B}_p$ est une loi de Bernouilli de paramètre $p=\frac{1}{2}$.
-
-% \end{multicols}
 \end{document}
