@@ -85,7 +85,7 @@
 
 \newcommand{\fnhref}[2]{\href{#1}{#2}\footnote{\url{#1}}}
 
-\newcommand{\TODO}[1]{\textsf{\color{orange}\bfseries TODO: #1}}
+\newcommand{\TODO}[1]{{\color{orange}\sffamily\paragraph{\sffamily TODO} #1\\}}
 
 \newcommand{\cad}{c'est-à-dire}
 \newcommand{\Cad}{C'est-à-dire}
@@ -132,7 +132,7 @@
 
 \begin{document}
 \maketitle
-\hrule
+\hrule height 0.8pt
 
 \begin{multicols}{2}
 \section{Résumé}
@@ -162,7 +162,10 @@ Dernièrement, les auteurs consacrent une section aux travaux similaires de la l
 \end{figure}
 
 \section{Implémentation}
-Le véritable défi de ce projet est l'implémentation de dp-GAN basique. En effet, son implémentation m'apprendra les fonctionnements détaillés de WGAN et d'un « agent comptable de la confidentialité » \citep{pinq}. En revanche, dp-GAN avancé ne consiste qu'en l'enrichissement de dp-GAN basique d'un apprentissage sur des données publiques et d'un clustering hiérarchique des paramètres du réseau. Or, comptant de plus ma formation en apprentissage statistique et profond, ces opérations ne présentent pas de plus-value pédagogique. Sachant le temps allouable au projet, il m'apparaît raisonnable de me concentrer sur l'implémentation de dp-GAN basique, testée sur MNIST, CelebA et/ou LSUN.
+
+\TODO{Un gros rapport, complet, avec explication du code, difficulté, est-ce que j'ai repris du début, mes résultats expérimentaux, etc.}
+
+Le véritable défi de ce projet est l'implémentation de dp-GAN basique. En effet, son implémentation me fera prendre en main WGAN et m'apprendra à gérer la confidentialité différentielle \citep{dlwdp, pinq}. En revanche, dp-GAN avancé ne consiste qu'en l'enrichissement de dp-GAN basique d'un apprentissage sur des données publiques et d'un clustering hiérarchique des paramètres du réseau. Or, comptant de plus ma formation en apprentissage statistique et profond, ces opérations ne présentent pas de plus-value pédagogique. Sachant le temps allouable au projet, il m'apparaît raisonnable de me concentrer sur l'implémentation de dp-GAN basique, testée sur MNIST, CelebA et/ou LSUN.
 
 GitHub : \url{https://github.com/alexandrehuat/dp-gan}.
 
