@@ -1,9 +1,17 @@
 import argparse
 from keras.models import Sequential
-from keras.models import Dense, Conv2D
+from keras.layers import Conv2D
+from keras.layers.advanced_activations import PReLU
 from keras.applications.vgg16 import VGG16
 from keras.datasets import mnist
+import numpy.random as rdm
+import matplotlib.pyplot as plt
 from .dpgan import BasicDPGAN
+
+
+def _dataset(name="mnist"):
+    if args.dataset == "mnist":
+        return mnist.load_data()
 
 
 def _parse_args():
@@ -20,14 +28,47 @@ def _parse_args():
 if __name__ == "__main__":
     args = _parse_args()
 
-    if args.dataset == "mnist":
-        (X_train, y_train), (X_test, y_test) = mnist.load_data()
+    (X_train, y_train), (X_test, y_test) = _dataset(args.dataset)
+
 
     # Instanciating the neural nets
-    generator = Sequential()
-    generator =
+    generator, discriminator = Sequential(), VGG16()
 
-    discriminator = VGG16()
+    generator.add(Conv2D(32, 5, input_shape=(28, 28)))
+    generator.add(PReLU())
+    generator.add(BatchNormalization())
+    generator.add(Dropout(0.2))
+
+    generator.add(Conv2D(32, 5))
+    generator.add(PReLU())
+    generator.add(BatchNormalization())
+    generator.add(Dropout(0.2))
+
+    generator.add(Conv2D(32, 5))
+    generator.add(PReLU())
+    generator.add(BatchNormalization())
+    generator.add(Dropout(0.2))
+
+    generator.add(Conv2D(32, 5))
+    generator.add(PReLU())
+    generator.add(BatchNormalization())
+    generator.add(Dropout(0.2))
+
+    generator.add(Conv2D(32, 5, activation="softmax"))
+
+    # Training dp-GAN
     dpgan = BasicDPGAN(generator, discriminator)
+    G, D = dpgan.train(X_train)
 
-    dpgan.train(X_train)
+    # Evaluating the generator by plotting some examples
+    Z = rdm.uniform(size=(9,) + X_train.shape)
+    im = G.predict(Z)
+
+    plt.figure()
+    for i in range(3):
+        for j in range(3):
+            plt.subplot(i+1, j+1, 3*i+j)
+            plt.imshow(im[i+j])
+    plt.tight_layout()
+    plt.show()
+
