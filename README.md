@@ -8,7 +8,7 @@ This repository contains my implementation of dp-GAN for my deep learning projec
 * Directory `dpgan` contains the implementation of the project. See the report in `summary` or the docstrings of each files to understand it.
 * Directory `data` contains all relevant data for the use of the implemented neural networks.
 
-All other useful information will be found in `summary/summary.pdf`.
+All other useful information can be found in `summary/summary.pdf`.
 
 ### Requirements
 
