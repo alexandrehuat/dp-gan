@@ -1,12 +1,11 @@
 import argparse
-from keras.models import Sequential
-from keras.layers import Dense, Conv2D, MaxPool2D, Flatten, Reshape
 from keras.datasets import mnist
 import tensorflow as tf
 import numpy as np
 import numpy.random as rdm
 import matplotlib.pyplot as plt
 from .dpgan import BasicDPGAN
+from .pretraining import mnist_models
 
 
 def _parse_args():
@@ -39,6 +38,8 @@ def _data(name="mnist"):
         X_train = X_train / 255
         X_test = X_test / 255
         return X_train[..., np.newaxis], X_test[..., np.newaxis]
+    else:
+        raise NotImplementedError
 
 
 def _evaluate(G, D, X, n=4):
@@ -49,7 +50,7 @@ def _evaluate(G, D, X, n=4):
     Z = G.predict(Z)
     y_pred = np.ravel(D.predict(np.concatenate([X[rdm.choice(X.shape[0], n)], Z])))
 
-    fig, axs = plt.subplots(2, n, figsize=(8, 4), sharex=True, sharey=True)
+    fig, axs = plt.subplots(2, n, figsize=(n, 1), sharex=True, sharey=True)
     for i in range(2):
         for j in range(n):
             ax = axs[i, j]
@@ -71,30 +72,10 @@ if __name__ == "__main__":
     im_shape = X_train.shape[1:]
 
     # Instanciating the neural nets
-    G, D = Sequential(), Sequential()
 
-    flat_size = np.prod(im_shape)
-    G.add(Flatten(input_shape=im_shape))
-    G.add(Dense(10, activation="softmax"))
-    for u in np.linspace(10, 784, 10, dtype=int)[1:]:
-        G.add(Dense(u, activation="selu"))
-    G.add(Reshape(im_shape))
-
-    D.add(Conv2D(64, 5, activation="selu", input_shape=im_shape))
-    D.add(MaxPool2D(padding="same"))
-    D.add(Conv2D(64, 4, activation="selu"))
-    D.add(MaxPool2D(padding="same"))
-    D.add(Conv2D(64, 3, activation="selu"))
-    D.add(MaxPool2D(padding="same"))
-    D.add(Flatten())
-    D.add(Dense(10, activation="selu"))
-    D.add(Dense(784, activation="selu"))
-    D.add(Dense(1, activation="softmax"))
-    weights_paths = ("data/weights/G_MNIST.h5", "data/weights/D_3Conv2Dense.h5")  # (args.Gnet, args.Dnet)
 
     # dp-GAN traning
     dpgan = BasicDPGAN(G, D)
-    dpgan.load_weights(*weights_paths)
     try:
         if not args.evaluate_only:
             train_kw = {"epochs": args.epochs,
@@ -113,4 +94,4 @@ if __name__ == "__main__":
     except (KeyboardInterrupt, SystemExit):
         dpgan.load_weights(*weights_paths)
     finally:
-        _evaluate(G, D, X_test, 4)
+        _evaluate(G, D, X_test, 8)

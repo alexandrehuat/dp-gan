@@ -8,7 +8,7 @@ pdflatex --shell-escape -synctex=1 -interaction=batchmode summary.tex
 biber summary
 
 # glossary
-makeglossaries -l summary
+makeglossaries summary
 
 # pdflatex bis
 pdflatex --shell-escape -synctex=1  -interaction=batchmode summary.tex

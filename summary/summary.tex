@@ -17,12 +17,13 @@
 \AtBeginBibliography{\small}
 
 \usepackage{titlesec}
-\titleformat{\section}[hang]{\Large\bfseries}{\thesection.~}{0pt}{}[]
+% \titleformat{\section}[hang]{\Large\bfseries}{\thesection.~}{0pt}{}[]
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhead{}
 \fancyhead[C]{\footnotesize \itshape A. Huat / Projet de \DL (2018)}
+\renewcommand{\headrulewidth}{0pt}
 
 \usepackage[nopostdot,nonumberlist,toc,acronyms]{glossaries}
 \renewcommand{\glossarypreamble}{\small}
@@ -164,6 +165,10 @@ Dernièrement, les auteurs consacrent une section aux travaux similaires de la l
 \section{Implémentation}
 
 \TODO{Un gros rapport, complet, avec explication du code, difficulté, est-ce que j'ai repris du début, mes résultats expérimentaux, etc.}
+
+Cette section détaille mon implémentation de dp-GAN, les difficultés rencontrées et leurs solutions possibles (implémentées ou non) ainsi que les résultats obtenus.
+
+\subsection{}
 
 Le véritable défi de ce projet est l'implémentation de dp-GAN basique. En effet, son implémentation me fera prendre en main WGAN et m'apprendra à gérer la confidentialité différentielle \citep{dlwdp, pinq}. En revanche, dp-GAN avancé ne consiste qu'en l'enrichissement de dp-GAN basique d'un apprentissage sur des données publiques et d'un clustering hiérarchique des paramètres du réseau. Or, comptant de plus ma formation en apprentissage statistique et profond, ces opérations ne présentent pas de plus-value pédagogique. Sachant le temps allouable au projet, il m'apparaît raisonnable de me concentrer sur l'implémentation de dp-GAN basique, testée sur MNIST, CelebA et/ou LSUN.
 

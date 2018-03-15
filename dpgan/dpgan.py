@@ -1,6 +1,4 @@
 import abc
-import os.path as osp
-import numpy as np
 import numpy.random as rdm
 import tensorflow as tf
 from datetime import datetime as dt
@@ -25,17 +23,9 @@ class DPGAN(abc.ABC):
     def train(self):
         pass
 
-    def load_weights(self, G_path=None, D_path=None):
-        if G_path and osp.exists(G_path):
-            self.G.load_weights(G_path)
-        if D_path and osp.exists(D_path):
-            self.D.load_weights(D_path)
-
-    def save_weights(self, G_path=None, D_path=None):
-        if G_path:
-            self.G.save_weights(G_path)
-        if D_path:
-            self.D.save_weights(D_path)
+    def save(self, paths):
+        self.G.save(paths[0])
+        self.D.save(paths[1])
 
 
 class BasicDPGAN(DPGAN):
@@ -85,14 +75,12 @@ class BasicDPGAN(DPGAN):
                     # for i in range(batch_size):
                     #     batch_grads.append(sess.run(D_grad, {x: X[rdm.choice(X.shape[0])]}))
 
-                    # Updating the privacy accountant
-                    # with sigma, batch_size and self.D.count_params()
+                    # TODO : Updating the privacy accountant with sigma, batch_size and self.D.count_params()
 
-                    # Updating the D
-
+                    # Updating D
                     sess.run(train_D, {x: X[rdm.choice(X.shape[0], batch_size)]})
 
-                # Updating the G
+                # Updating G
                 if verbose > 0:
                     print("epoch={}/{}, training G (time={})".\
                       format(e, epochs, _toc(tic)) + 24 * " ", end="\r")
@@ -103,12 +91,12 @@ class BasicDPGAN(DPGAN):
                 G_convergence = all(sess.run(tf.norm(self.G.trainable_weights[i] - theta_old[i]) <= tol) for i in range(len(self.G.trainable_weights)))
 
                 # Saving the models
-                if save_paths is not None:
+                if save_paths:
                     if verbose > 0:
-                        print("/!\ SAVING THE NEURAL NETS /!\ ".format(e, epochs) + 32 * " ", end="\r")
-                    self.save_weights(*save_paths)
+                        print("/!\ SAVING THE NEURAL NETWORKS /!\ ".format(e, epochs) + 32 * " ", end="\r")
+                    self.save(save_paths)
 
-                # delta = request A with eps0
+                # TODO : delta = request privacy with eps0
 
                 if delta > delta0 or G_convergence:
                     break

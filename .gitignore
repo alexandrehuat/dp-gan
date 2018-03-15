@@ -1,4 +1,5 @@
-*.DS_Store
+**/.DS_Store
 *.idea
 docs/*.pdf
 **/__pycache__
+*.pyc
