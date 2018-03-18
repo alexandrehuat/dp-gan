@@ -12,16 +12,15 @@ from keras.layers import Dense, Conv2D, MaxPool2D, Flatten, Reshape
 from keras.datasets import mnist
 from keras.utils import to_categorical
 import matplotlib.pyplot as plt
-plt.ion()
 
-MODELS_PATHS = ("data/models/MNIST_AE_5Dense.h5", "data/models/MNIST_classifier_3Conv3Dense.h5")
+MODELS_PATHS = ("data/models/MNIST_AE_5Dense.h5", "data/models/MNIST_3Conv3Dense.h5")
 
 
-def mnist_models():
+def mnist_models(pretrained=False):
     im_shape = (28, 28, 1)
 
     p = MODELS_PATHS[0]
-    if osp.exists(p):
+    if pretrained and osp.exists(p):
         G = load_model(p)
     else:
         G = Sequential()
@@ -35,7 +34,7 @@ def mnist_models():
         G.compile("adam", "mse")
 
     p = MODELS_PATHS[1]
-    if osp.exists(p):
+    if pretrained and osp.exists(p):
         D = load_model(p)
     else:
         D = Sequential()
@@ -74,18 +73,18 @@ if __name__ == "__main__":
         GE, DE = int(sys.argv[1]), int(sys.argv[2])  # training epochs to do
 
         # Loading models
-        G, D = mnist_models()
+        G, D = mnist_models(pretrained=True)
 
         # Loading data
         X_train, X_test, y_train, y_test = data()
 
-        b, v = 64, 0.1  # batch_size, validation_split
+        b, v = 32, 0.1  # batch_size, validation_split
         ge, de = 0, 0  # epochs counters
 
         # Training loop
         while ge+de < GE+DE:
             if ge < GE:
-                print("Generator: Global epoch {}/{} (Time elapsed: {})".format(ge + 1, GE, dt.now() - tic))
+                print("[{}] Generator: Global epoch {}/{}".format(dt.now() - tic, ge + 1, GE))
                 Z = np.random.uniform(size=X_train.shape) - 0.5
                 X_tilde = (X_train + Z).clip(0, 1)
                 e = 1 if de < DE else GE-ge
@@ -93,13 +92,13 @@ if __name__ == "__main__":
                 ge += e
 
             if de < DE:
-                print("Discriminator: Global epoch {}/{} (Time elapsed: {})".format(de + 1, DE, dt.now() - tic))
+                print("[{}] Discriminator: Global epoch {}/{}".format(dt.now() - tic, de + 1, DE))
                 e = 1 if ge < GE else DE-de
                 train(D, MODELS_PATHS[1], X_train, y_train, b, e, validation_split=v)
                 de += e
     finally:
         # Quantitative evaluation
-        print(80*"*")
+        print(80*"-")
         m = G.evaluate(X_test, X_test, b)
         print("Generator's test MSE: {:.4f}".format(m))
         m = D.evaluate(X_test, y_test, b)[1]
@@ -122,4 +121,4 @@ if __name__ == "__main__":
         fig.tight_layout()
         fig.savefig("summary/pretraining_G_{}epochs.png".format(GE))
         print("Close the figures to quit")
-        plt.close("all")
+        plt.show()

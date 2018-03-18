@@ -3,3 +3,4 @@
 docs/*.pdf
 **/__pycache__
 *.pyc
+**/_minted*

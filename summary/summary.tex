@@ -1,4 +1,4 @@
-\documentclass[a4paper,11pt,twocolumn,twoside]{article}
+\documentclass[a4paper,11pt,twoside]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -11,19 +11,17 @@
 \usepackage{rotating}
 
 \usepackage{csquotes}
-\usepackage[natbib=true,backend=biber,style=ieee,sort=none,sortcites=true,backref=true,backref=false,url=true,isbn=true,doi=true]{biblatex}
+\usepackage[natbib=true,backend=biber,style=ieee,sort=none,sortcites=true,backref=true,backref=false,url=false,isbn=true,doi=true]{biblatex}
     \DefineBibliographyExtras{french}{\restorecommand\mkbibnamefamily}
     \AtBeginBibliography{\small}
     \addbibresource{references.bib}
-
-\usepackage{titlesec}
-% \titleformat{\section}[hang]{\Large\bfseries}{\thesection.~}{0pt}{}[]
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhead{}
 \fancyhead[C]{\textit{A. Huat / Projet de \DL\ (2018)}}
 \fancyhead[LE,RO]{\thepage}
+\fancyfoot{}
 \renewcommand{\headrulewidth}{0pt}
 
 \usepackage[nopostdot,nonumberlist,toc,acronyms]{glossaries}
@@ -38,33 +36,27 @@
 \usepackage{multicol}
 \newenvironment{colfig}{\par\medskip\noindent\minipage{\linewidth}}{\endminipage\par\medskip}
 
-\usepackage{float}
-\usepackage{graphicx}
+\usepackage{float,here,placeins,graphicx,wrapfig}
 	% Centering figures by default
 	\makeatletter
 	\g@addto@macro\@floatboxreset{\centering}
 	\makeatother
-\usepackage{here}
-\usepackage{placeins}
-\usepackage[labelfont=bf,justification=justified,font=small,labelsep=period]{caption}
-    \captionsetup[table]{singlelinecheck=false,name=Tableau}
-% \usepackage{floatrow}
+\usepackage{}
+\usepackage[labelfont=bf,justification=justified,font=small,labelsep=quad]{caption}
+    \captionsetup[table]{name=Tableau,singlelinecheck=false}
 	\floatplacement{figure}{htbp}
 	\floatplacement{table}{htbp}
 
-\usepackage[colorlinks=true,plainpages=false,breaklinks=true,allcolors=NavyBlue]{hyperref}
+\usepackage[colorlinks=true,plainpages=false,breaklinks=true,allcolors=ProcessBlue]{hyperref}
 \usepackage{fancyref}
 
-\usepackage{listings,listingsutf8}
-	\lstset{
-		breaklines=true,
-		deletekeywords={},
-		frame=single,
-		morekeywords={pour, chaque},
-		tabsize=4,
-		basicstyle=\scriptsize,
-		escapeinside={lx*}{*lx}
-}
+\usepackage[newfloat]{minted}
+    \newcommand{\listingautorefname}{Listing}
+    \SetupFloatingEnvironment{listing}{name=Listing}
+    \captionsetup[listing]{singlelinecheck=false}
+    \usemintedstyle{friendly}
+    \definecolor{grey05}{rgb}{0.95,0.95,0.95}
+    \setminted{tabsize=4,fontsize=\footenotesize,frame=none,breaklines,bgcolor=grey05}
 
 % Maths
 
@@ -96,6 +88,7 @@
 \newcommand{\AH}{Alexandre Huat}
 \newcommand{\eg}{\textit{e.g.}}
 \newcommand{\ie}{\textit{i.e.}}
+\newcommand{\Ie}{\textit{I.e.}}
 \newcommand{\etc}{\textit{etc.}}
 \newcommand{\etal}{\textit{et al.}}
 \newcommand{\vs}{\textit{vs.}}
@@ -126,7 +119,7 @@
 % Title
 % --------------------------------------
 
-\title{\textbf{Projet de \DL}\\« Differentially Private Releasing via Deep Generative Model »}
+\title{\textbf{Projet de \DL}\\«~Differentially Private Releasing via Deep Generative Model~»}
 \author{\textbf{\AH}\\INSA Rouen Normandie\\Master Science des Données}
 \date{21 mars 2018}
 
@@ -135,79 +128,137 @@
 \begin{document}
 \maketitle
 \thispagestyle{empty}
-\hrule height 0.8pt
 
-\section{Résumé}
+\section{Résumé d'article}
+\label{resume}
+
 Supposons un groupe de clients et un prestateur de services informatiques collectant et analysant leurs données (\eg\ classification d'images). Au cours des tâches d'analyses, le prestateur est amené à traiter des données sensibles. Afin de respecter la vie privée de ses clients, il doit trouver un moyen de traiter efficacement ces données tout en conservant leur confidentialité. C'est à cette problématique que répondent \citet{dpgan} par l'architecture dp-GAN de l'article résumé ici.
 
 La \autoref{dp-gan_role} illustre le rôle de dp-GAN, qui est de générer des données synthétiques mais sémantiquement riches, \ie\ suffisamment représentatives des clients, sans violation de leur vie privée.
 En introduction, les auteurs rappellent les défis à relever en apprentissage sous contrainte de confidentialité et présentent les apports de dp-GAN. En plus de sa capacité à générer une infinité de données, dp-GAN garantit l'anonymisation des données réelles par respect du principe de « confidentialité différentielle »\footnote{Synthétiqument, la confidentialité différentielle mesure la capacité d'un tiers à déduire des données privées des résultats d'un algorithme ; \cf\ exemple à \url{https://fr.wikipedia.org/wiki/Confidentialité_différentielle#Formalisation}.}.
 Pour ce faire, dp-GAN applique au réseau adverse génératif de Wisserstein (WGAN) amélioré des mécanismes d'anonymisation à l'état de l'art, alors optimisés pour gagner en stabilité et en scalabilité.
 
-En Section 2, Zhang \etal\ font un rappel théorique sur les GAN et justifient leur utilisation du WGAN amélioré par une plus grande stabilité et un plus court temps d'apprentissage que le GAN originel. Ils font également la définition formelle de la confidentialité différentielle et citent des propriétés associées dont bénéficient dp-GAN.
-
-La Section 3 présente dp-GAN dans sa version basique et fournit son algorithme d'apprentissage (Algorithme 1). Pour assurer sa confidentialité, à chaque mise-à-jour, l'algorithme bruite le gradient du discriminateur (bruitage gaussien et seuillage), à partir duquel un pirate pourrait autrement reconstruire les données privées. Cette technique est communément utilisée dans la littérature. Une preuve théorique du niveau de confidentialité différentielle atteint par l'algorithme est également apportée.
-
-Néanmoins, cette version de dp-GAN possède trois inconvénients : (i) elle génère des données de faible qualité ; (ii) elle converge moins rapidement que le GAN non-confidentiel, voire diverge ; (iii) elle est rigide et n'exploite aucune ressource bonus, \eg\ des données publiques. Pour palier ces défauts, la version avancée de dp-GAN implémente : (i) un regroupement des paramètres du réseau pour un réglage fin et spécifique de leurs bruits respectifs ; (ii) un seuillage adaptatif du gradient, qui évolue au cours des itérations ; (iii) une initialisation des paramètres du réseau par pré-apprentissage sur les données publiques disponibles. Ces améliorations boostent la vitesse de convergence et la confidentialité de dp-GAN. La Section 4 détaille l'algorithme de  cette version avancée (Algorithme 3).
-
-S'en suit un rapport d'expériences sur trois bases célèbres et libres d'accès : \href{http://yann.lecun.com/exdb/mnist/}{MNIST}, \href{http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html}{CelebA} et \href{http://lsun.cs.princeton.edu/2015.html}{LSUN}. LSUN est ensuite divisée en deux bases, l'une labellisée (LSUN-L) et l'autre non-labellisée (LSUN-U). Les expériences sont réalisées avec TensorFlow mais le code n'est pas partagé par ses auteurs. Certains paramètres de tests sont renseignés mais l'architecture des réseaux générateurs et discriminateurs ne le sont pas. Ainsi, la Section 5 propose une évaluation qualitative et quantitative des performances du système. De mon point de vue, les images générées par dp-GAN, quelle que soit la base, sont assez vraisemblables ; MNIST en particulier est très bien simulée.
-Dans leur deux premières expériences, Zhang \etal\ comparent quantitativement la qualité des données générées par dp-GAN aux données réelles et à celles générées par le GAN non-confidentiel. dp-GAN performe légèrement moins bien pour les données labellisées comme pour les non-labellisées. Dans leur troisième expérience, les auteurs comparent les performances atteintes en classification sur LSUN-L après apprentissage sur : (i) les données réelles seules ; (ii) les données réelles jointes aux données synthétisées par un GAN non-confidentiel ; (iii) les données réelles jointes aux données synthétisées par dp-GAN. Il en ressort que l'apprentissage avec les données synthétiques permet systématiquement une diminution des taux d'erreurs (jusqu'à $-3.3 \%$ pour dp-GAN, contre $-7.7 \%$ pour le GAN non-confidentiel). Quatrièmement, en terme de score d'Inception et de Jensen-Schannon, une ultime expérimentation valide l'efficacité des stratégies d'optimisations dont bénéficie dp-GAN avancé.
-
-Dernièrement, les auteurs consacrent une section aux travaux similaires de la littérature. Puis, ils concluent en rappelant l'intérêt et les améliorations apportées par dp-GAN et, enfin, ouvrent la discussion sur la limite que l'architecture n'a été testée que sur des images -- une évaluation sur d'autres types de données (\eg\ texte) étant bienvenue.
-
 \begin{figure}
     \centering
-    \includegraphics[width=0.7\textwidth]{dp-gan_role.png}
+    \includegraphics[width=12cm]{dp-gan_role.png}
     \captionof{figure}{La place de dp-GAN dans la chaîne de traitement des données confidentielles. Le « \textit{curator} » est l'entité qui anonymise les données pour l'\textit{analyst}.}
     \label{dp-gan_role}
 \end{figure}
 
+En Section 2, Zhang \etal\ font un rappel théorique sur les GAN et justifient leur utilisation du WGAN amélioré par une plus grande stabilité et un plus court temps d'apprentissage que le GAN originel. Ils font également la définition formelle de la confidentialité différentielle et citent des propriétés associées dont bénéficient dp-GAN. La Section 3 présente dp-GAN dans sa version basique et fournit son algorithme d'apprentissage (Algorithme 1). Pour assurer sa confidentialité, à chaque mise-à-jour, l'algorithme bruite le gradient du discriminateur (bruitage gaussien et seuillage), à partir duquel un pirate pourrait autrement reconstruire les données privées. Cette technique est communément utilisée dans la littérature. Une preuve théorique du niveau de confidentialité différentielle atteint par l'algorithme est également apportée.
+
+Néanmoins, cette version de dp-GAN possède trois inconvénients : (i) elle génère des données de faible qualité ; (ii) elle converge moins rapidement que le GAN non-confidentiel, voire diverge ; (iii) elle est rigide et n'exploite aucune ressource bonus, \eg\ des données publiques. Pour palier ces défauts, la version avancée de dp-GAN implémente : (i) un regroupement des paramètres du réseau pour un réglage fin et spécifique de leurs bruits respectifs ; (ii) un seuillage adaptatif du gradient, qui évolue au cours des itérations ; (iii) une initialisation des paramètres du réseau par pré-apprentissage sur les données publiques disponibles. Ces améliorations boostent la vitesse de convergence et la confidentialité de dp-GAN. La Section 4 détaille l'algorithme de  cette version avancée (Algorithme 3).
+
+S'en suit un rapport d'expériences sur trois bases célèbres et libres d'accès : \href{http://yann.lecun.com/exdb/mnist/}{MNIST}, \href{http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html}{CelebA} et \href{http://lsun.cs.princeton.edu/2015.html}{LSUN}. LSUN est ensuite divisée en deux bases, l'une labellisée (LSUN-L) et l'autre non-labellisée (LSUN-U). Les expériences sont réalisées avec TensorFlow (TF) mais le code n'est pas partagé par ses auteurs. Certains paramètres de tests sont renseignés mais l'architecture des réseaux générateurs et discriminateurs ne le sont pas. Ainsi, la Section 5 propose une évaluation qualitative et quantitative des performances du système. De mon point de vue, les images générées par dp-GAN, quelle que soit la base, sont assez vraisemblables ; MNIST en particulier est très bien simulée.
+Dans leur deux premières expériences, Zhang \etal\ comparent quantitativement la qualité des données générées par dp-GAN aux données réelles et à celles générées par le GAN non-confidentiel. dp-GAN performe légèrement moins bien pour les données labellisées comme pour les non-labellisées. Dans leur troisième expérience, les auteurs comparent les performances atteintes en classification sur LSUN-L après apprentissage sur : (i) les données réelles seules ; (ii) les données réelles jointes aux données synthétisées par un GAN non-confidentiel ; (iii) les données réelles jointes aux données synthétisées par dp-GAN. Il en ressort que l'apprentissage avec les données synthétiques permet systématiquement une diminution des taux d'erreurs (jusqu'à $-3.3 \%$ pour dp-GAN, contre $-7.7 \%$ pour le GAN non-confidentiel). Quatrièmement, en terme de score d'Inception et de Jensen-Schannon, une ultime expérimentation valide l'efficacité des stratégies d'optimisations dont bénéficie dp-GAN avancé.
+
+Dernièrement, les auteurs consacrent une section aux travaux similaires de la littérature. Puis, ils concluent en rappelant l'intérêt et les améliorations apportées par dp-GAN et, enfin, ouvrent la discussion sur la limite que l'architecture n'a été testée que sur des images -- une évaluation sur d'autres types de données (\eg\ texte) étant bienvenue.
+
 \section{Implémentation}
+\label{impl}
 
 \TODO{Un gros rapport, complet, avec explication du code, difficulté, est-ce que j'ai repris du début, mes résultats expérimentaux, etc.}
 
-Cette section détaille mon implémentation de dp-GAN, les difficultés rencontrées et leurs solutions possibles --- implémentées ou non --- ainsi que les résultats obtenus.
+Cette section détaille mon implémentation de dp-GAN, les difficultés rencontrées et leurs solutions possibles (possiblement non-implémentées) ainsi que les résultats obtenus.
 
 Le code du projet est disponible sur Github à : \url{https://github.com/alexandrehuat/dp-gan}.
 
-\subsection{Motivations}
 
-Le véritable défi de ce projet, en accord avec l'objet du cours de \DL, est l'implémentation de dp-GAN basique. En effet, celle-ci demande une prise en main de WGAN amélioré et des calculs de confidentialité différentielle \citep{dlwdp, pinq}. En comparaison, dp-GAN avancé ne consiste qu'en l'enrichissement de dp-GAN basique d'un apprentissage sur des données publiques et d'un clustering hiérarchique des paramètres du réseau. Or, comptant ma formation en apprentissage statistique, ces opérations ne présentent pas de plus-value pédagogique. Sachant le temps allouable au projet, il m'est apparu raisonnable de me concentrer sur l'implémentation de dp-GAN basique. Quant aux données d'expérimentations, j'ai choisi d'utiliser MNIST pour faciliter l'apprentissage et l'interprétabilité des résultats.
+\subsection{Objectifs}
+\label{obj}
 
-\subsection{Technologie}
+Le véritable défi de ce projet, et en accord avec l'objet du cours de \DL, est l'implémentation de dp-GAN basique. En effet, celle-ci demande une prise en main de WGAN amélioré et des calculs de confidentialité différentielle \citep{dlwdp, pinq}. En comparaison, dp-GAN avancé ne consiste qu'en l'enrichissement de dp-GAN basique d'un apprentissage sur des données publiques et d'un \textit{clustering} hiérarchique des paramètres du réseau. Or, comptant ma formation en apprentissage statistique, ces opérations ne présentent pas de plus-value pédagogique. Sachant le temps allouable au projet, il m'est apparu raisonnable de me concentrer sur l'implémentation de dp-GAN basique. Quant aux données d'expérimentations, j'ai choisi d'utiliser MNIST pour faciliter l'apprentissage et l'interprétabilité des résultats.
 
-Dans \cite{dpgan}, les auteurs précisent avoir développé dp-GAN en TensorFlow. Étant donné l'avénement de TensorFlow dans la communauté du \DL
+
+\subsection{Algorithme, technologie et organisation}
+\label{techno}
+
+\begin{figure}
+    \includegraphics[width=10cm]{alg1.png}
+\end{figure}
+
+Comme dit en \autoref{resume}, l'algorithme d'apprentissage de dp-GAN basique (Algorithme 1) est celui de WGAN amélioré avec un bruitage et seuillage de gradients. Étant donné l'avénement de TF dans la communauté du \DL\ ainsi que l'utilisation de cette librairie par \citet{dpgan}, j'ai choisi de réaliser toute la partie bas niveau du projet (apprentissage de dp-GAN) en TF et d'utiliser Keras pour les opérations de plus haut niveau (création, sauvegarde et évaluation des modèles). L'utilisation de TF était nécessaire pour brouiller le gradient (ligne 8), en recherche de confidentialité. Sans ces opérations, le projet aurait essentiellement été une implémentation de WGAN amélioré. Cette dernière aurait été totalement réalisable en Keras par alternance d'apprentissage du générateur ($G$) et du discriminateur ($D$) en gelant les poids de $G$ quand $D$ apprend, resp. de $D$ quand $G$ apprend.
+
+De plus, connaissant Keras par de précédents cours, projets personnels ou le PIC Becquerel 2017, un projet en Keras pur m'aurait permis de me concentrer sur les tests ou améliorations de la méthode codée. À l'inverse, je ne connaissais pas TF avant ce projet. Je dédiai donc environ deux tiers de mes efforts au développement de l'Algorithme 1 en TF. Puis, je consacrai le temps restant au pré-apprentissage et tests des modèles. Je reviendrai sur ces points en \autoref{app} et \autoref{eval}.
+
+Enfin, je dois préciser qu'il ne m'a pas été possible d'implémenter la partie « vérification de la confidentialité » de dp-GAN (lignes 9 et 13). En effet, les auteurs donnaient trop peu d'explications sur ces opérations; il m'aurait fallu lire \cite{dlwdp} et \cite{pinq} pour les intégrer. En outre, je l'ai omise, car cette partie sortait du cadre \DL, et il me fallait tester mon code dans le temps imparti. Ceci n'impacte pas véritablement l'apprentissage en dehors du retrait d'un critère d'arrêt.
+
 
 \subsection{Apprentissage}
+\label{app}
+
+L'apprentissage de dp-GAN est une procédure fastidieuse est dure à paramétrer. Dans \cite{dpgan}, les auteurs ne précisent ni les architectures neuronales utilisées sur les réseaux, ni le paramètre de seuillage $C$. Mon pass Multipass Université ne me le permettait pas. Ma machine personnelle est un Macbook Air, avec macOS High Sierra, un processeur Intel Core i7 @ 2.2 GHz à deux cœurs et une RAM de 8 GO @ 1600 MHz. Je fus donc contraint d'utiliser de petites architectures peu profondes détaillées ci-dessous.
+
+\begin{description}
+    \item[Générateur] Auto-encodeur à 5 couches cachées denses (nombre de neurones: )
+    \todo{refaire un préapprentissage avec initialisation à 0}
+    \item[Discriminateur]
+\end{description}
+
+
+\subsubsection{dp-GAN}
+
+
 
 préapprentissage
 	AE 50 epochs, test mse = 0.0297
-	CNN 2 epochs, test acc = 98.57 %
+	CNN 2 epochs, test acc = 98.57 \%
 
-validation = 10 %
+validation = 10 \%
 
 DIFFICULTÉS:
 * première impl avec "with tf.Session()": app avec tf -> pred avec keras -> "FailedPreconditionError (see above for traceback): Attempting to use uninitialized value is_real/bias"
 	solution: self.tf_session! référence jamais perdue donc calculs tjrs possible
 
-\subsection{Test}
+
+DPGAN TRAINING AVEC 1000 EPOCHS, LAMDA 10 ALPHA 0002 BETA1 09 BETA2 05
+Discriminator's mean overestimation of X_test: -0.4642
+Discriminator's mean overestimation of Z: 0.6233
+Discriminator's mean overestimation of G(z): 0.5258
+
+
+e 1000 l 10 a 0.001 b1 0.9 b2 0.999 C 0.5 s 1
+Discriminator's mean overestimation of X_test: -0.5864
+Discriminator's mean overestimation of Z: 0.4100
+Discriminator's mean overestimation of G(z): 0.3943
+
+\subsection{Évaluation}
+\label{eval}
+
+\subsection{Interfaçage de TF et Keras}
+\label{tf_and_keras}
+
+De manière générale, l'interfaçage de Keras et TF est fluide, presque transparent. Cependant, j'ai rencontré une difficulté lorsque je souhaitais évaluer les réseaux via Keras après leur apprentissage avec TF. EN effet, j'obtenais une erreur du type:
+\mint{python}$FailedPreconditionError: Attempting to use uninitialized value <layer_name>/bias$
+Cette erreur était causée par la perte de la référence des poids des réseaux après l'apprentissage. Ceci car les poids dépendent de la session TF qui exécute leur mise à jour, et que cette session était éphémère dans ma première implémentation. Ainsi, j'ai résolu ce problème en pérénisant la session sous la forme d'un attribut de \mintinline{python}$DPGAN$ (\cf\ \autoref{tfsess_after}) plutôt que d'utiliser une session locale à la fonction d'apprentissage (\cf\ \autoref{tfsess_before}).
+
+\begin{listing}
+\caption{Avant: Gestion des sessions TF avec erreur}
+\label{tfsess_before}
+\begin{minted}{python}
+def BasicDPGAN(DPGAN):
+    def train(...):
+        ...  # Préparation des calculs
+        with tf.Session() as sess:
+            <results> = sess.run(<training>)  # Exécution des calculs
+        return <results>  # La référence est supprimée à ce moment
+\end{minted}
+\end{listing}
+
+\begin{listing}
+\caption{Après: Gestion des sessions TF sans erreur}
+\label{tfsess_after}
+\begin{minted}{python}
+def BasicDPGAN(DPGAN):
+    def train(...):
+        ...  # Préparation des calculs
+        <results> = self.tf_session.run(<training>)  # Exécution des calculs
+        self.tf_session.close()
+        return <results>
+\end{minted}
+\end{listing}
+
 
 \printbibliography[title=Références,heading=bibintoc]
-
-\end{document}
-
-\begin{document}
-
-
-
-\end{document}
-\begin{document}
-
-
-
-\end{document}
-\begin{document}
-
-
 
 \end{document}

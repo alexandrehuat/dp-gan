@@ -1,4 +1,5 @@
 import abc
+import numpy as np
 import numpy.random as rdm
 import tensorflow as tf
 from datetime import datetime as dt
@@ -57,42 +58,50 @@ class BasicDPGAN(DPGAN):
         delta = 0
         self.tf_session.run(tf.global_variables_initializer())
         self.tf_session.run(tf.local_variables_initializer())
+        batch_loss_hist = []
+        D_loss_hist = []
+        G_loss_hist = []
 
         # Training loop
         print("Training")
         for e in range(1, epochs+1):
+            verb = "Epoch {}/{}".format(e, epochs)
+            print(verb, end="\r")
+            verb += " - D_loss: ["
             for t in range(1, n_critic+1):
-                # batch_grads = []
-                # for i in range(batch_size):
-                #     batch_grads.append(self.tf_session.run(D_grad, {x: X[rdm.choice(X.shape[0])]}))
-
-                # TODO : Updating the privacy accountant with sigma, batch_size and self.D.count_params()
-
                 # Updating D
                 [loss], _ = self.tf_session.run([D_loss, train_D], {x: X[rdm.choice(X.shape[0], batch_size)]})
-                print("[{}] epoch={}/{} - critic_iter={}/{} - D_loss={:.4f}".format(_toc(tic), e, epochs, t, n_critic, loss))
+                verb += "{:.2f}{}".format(loss, int(t<n_critic)*", ")
+                print(verb, end="\r")
+                D_loss_hist.append(loss)
+            verb += "]"
+
+                # TODO: Updating the privacy accountant with sigma, batch_size and self.D.count_params()
 
             # Updating G
             theta_old = self.G.trainable_weights
             [loss], _ = self.tf_session.run([G_loss, train_G])
-            print("[{}] epoch={}/{} - G_loss={:.4f}".format(_toc(tic), e, epochs, loss))
+            G_loss_hist.append(loss)
+            verb += " - G_loss: [{:.2f}] - Time elapsed: {}".format(loss, _toc(tic))
+            print(verb)
 
             # Saving the models
             if save_paths:
-                print("/!\ SAVING THE NETS /!\ ")
                 self.save(save_paths)
 
-            # TODO : delta = request privacy with eps0
+            # TODO: delta = request privacy with eps0
 
             # Stopping criterias
-            G_convergence = all(self.tf_session.run(tf.norm(self.G.trainable_weights[i] - theta_old[i]) <= tol) for i in range(len(self.G.trainable_weights)))
-            if (delta > delta0) or G_convergence:
-                break
+            if tol >= 0:
+                G_convergence = all(self.tf_session.run(tf.norm(self.G.trainable_weights[i] - theta_old[i]) <= tol) for i in range(len(self.G.trainable_weights)))
+                if (delta > delta0) or G_convergence:
+                    break
 
         # Returning results
-        if G_convergence:
-            print("Training stopped: G has converged")
-        if delta > delta0:
-            print("Training stopped: Privacy budget exceeded (delta={})".format(delta))
+        if tol >= 0:
+            if G_convergence:
+                print("Training stopped: G has converged")
+            if delta > delta0:
+                print("Training stopped: Privacy budget exceeded (delta={})".format(delta))
         self.tf_session.close()
-        return self.G, self.D
+        return self.G, self.D, G_loss_hist, D_loss_hist
