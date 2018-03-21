@@ -90,17 +90,18 @@ if __name__ == "__main__":
     # Instanciating the neural nets
     G, D = mnist_models(pretrained=False)
     if osp.exists(args.G_path):
+        print("Loading model G")
         G = load_model(args.G_path)
-    if args.D_path == MODELS_PATHS[1]:
-        # Adapting the discriminator net
-        D.pop()
-        D.add(Dense(1, activation="sigmoid", name="is_real"))
-        # Freezing the convolutionnal layers
-        for i in range(len(D.layers)):
-            if isinstance(D.layers[i], Conv2D):
-                D.layers[i].trainable = False
-    else:
+    if osp.exists(args.D_path):
+        print("Loading model D")
         D = load_model(args.D_path)
+    # Adapting the discriminator net
+    D.pop()
+    D.add(Dense(1, activation="sigmoid", name="is_real"))
+    # Freezing the convolutionnal layers
+    # for i in range(len(D.layers)):
+    #     if isinstance(D.layers[i], Conv2D):
+    #         D.layers[i].trainable = False
 
     try:
         # dp-GAN training
@@ -128,7 +129,11 @@ if __name__ == "__main__":
     finally:
         print("Evaluating the nets")
         fig = evaluate(G, D, X_test)
-        fig.savefig("summary/dpgan_evaluation_l{}_a{}_b1{}_b2{}_C{}_s{}.png".format(args.lam, *args.adam, args.clip, args.sigma))
+        path = "summary/dpgan_evaluation_t{}_l{}_a{}_b1{}_b2{}_C{}_s{}".format(args.critic, args.lam, *args.adam, args.clip, args.sigma)
+        if osp.exists(path + ".png"):
+            path += "_bis"
+        path += ".png"
+        fig.savefig(path)
 
         # Plotting the training losses
         fig, ax = plt.subplots()
@@ -137,8 +142,13 @@ if __name__ == "__main__":
         ax.plot(xx, D_loss_hist, "-x", label="D's loss", ms=3.6)
         ax.grid(axis="y")
         ax.set_xlabel("Batch iteration")
-        ax.set_title(r"Parameters: $\lambda={}, \alpha={}, \beta_1={}, \beta_2={}, C={}, \sigma={}$".format(args.lam, *args.adam, args.clip, args.sigma))
+        ax.set_title(r"Parameters: $n_\mathit{critic}"+r"={}, \lambda={}, C={}, \sigma={},$".format(args.critic, args.lam, args.clip, args.sigma)+"\n"+r"$\alpha={}, \beta_1={}, \beta_2={}$".format(*args.adam))
         ax.legend(loc="upper right")
-        fig.savefig("summary/dpgan_loss_history_l{}_a{}_b1{}_b2{}_C{}_s{}.png".format(args.lam, *args.adam, args.clip, args.sigma))
+        path = "summary/dpgan_loss_history_t{}_l{}_a{}_b1{}_b2{}_C{}_s{}".format(args.critic, args.lam, *args.adam, args.clip, args.sigma)
+        if osp.exists(path + ".png"):
+            path += "_bis"
+        path += ".png"
+        fig.savefig(path)
+
         print("Close the figures to quit")
         plt.show()

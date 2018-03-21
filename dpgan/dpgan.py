@@ -46,8 +46,7 @@ class BasicDPGAN(DPGAN):
         D_grad_x_hat = tf.gradients(self.D(x_hat), x_hat)[0]
         D_loss = tf.reduce_mean(self.D(self.G(z)) - self.D(x) + tf.multiply(tf.constant(lam, TF_FLOAT), tf.square(tf.norm(D_grad_x_hat, axis=1 if x_hat._rank() <= 2 else (1, 2)) - tf.constant(1.))), axis=0)
         D_grad_vars = optimizer.compute_gradients(D_loss, self.D.trainable_weights)
-        D_grad_vars = [(tf.divide(grad, tf.maximum(tf.constant(1.), tf.divide(tf.norm(grad), tf.constant(C, TF_FLOAT)))) + tf.random_normal(grad.shape, 0, (sigma * C) ** 2), var) for grad, var in D_grad_vars] # Clipping and noising
-        # dimension incompatibility: D_grad_vars = [(tf.reduce_mean(grad, axis=0), var) for grad, var in D_grad_vars]
+        D_grad_vars = [(tf.divide(grad, tf.maximum(tf.constant(1.), tf.divide(tf.norm(grad), tf.constant(C, TF_FLOAT)))) + tf.random_normal(grad.shape, 0, sigma * C), var) for grad, var in D_grad_vars] # Clipping and noising
         train_D = optimizer.apply_gradients(D_grad_vars)
 
         G_loss = tf.reduce_mean(-self.D(self.G(z)), axis=0)
@@ -79,10 +78,10 @@ class BasicDPGAN(DPGAN):
                 # TODO: Updating the privacy accountant with sigma, batch_size and self.D.count_params()
 
             # Updating G
-            theta_old = self.G.trainable_weights
+            theta_old = self.tf_session.run([tf.Variable(weights).assign(weights) for weights in self.G.trainable_weights])
             [loss], _ = self.tf_session.run([G_loss, train_G])
             G_loss_hist.append(loss)
-            verb += " - G_loss: [{:.2f}] - Time elapsed: {}".format(loss, _toc(tic))
+            verb += " - G_loss: [{:.2f}] <{}>".format(loss, _toc(tic))
             print(verb)
 
             # Saving the models
