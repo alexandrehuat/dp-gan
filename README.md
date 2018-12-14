@@ -17,4 +17,4 @@ In a Python 3 virtual environment, run `pip install -r requirements.txt`.
 The test of dp-GAN requires the MNIST dataset. Since it needs a prior download from Keras, its first run could be long.
 
 ### Reference
-X. Zhang, S. Ji et T. Wang, "Differentially Private Releasing via Deep Generative Model", _ArXiv e-prints_, jan. 2018. arXiv : [1801.01594 [cs.CR]](https://arxiv.org/abs/1801.01594).
+X. Zhang, S. Ji and T. Wang, "Differentially Private Releasing via Deep Generative Model", _ArXiv e-prints_, jan. 2018. arXiv : [1801.01594 [cs.CR]](https://arxiv.org/abs/1801.01594).
