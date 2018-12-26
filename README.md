@@ -4,9 +4,9 @@
 ----
 
 This repository contains my implementation of dp-GAN (Differentially Private Generative Adversarial Network) for my deep learning project assessment. It is organized as follows:
-* Directory `summary` contains the report of the project. This document consists in (i) a summary of the original paper of dp-GAN and (ii) a report on my implementation. Its PDF version has been precompiled, but run `./compile.sh` if needed.
+* Directory `summary` contains the report of the project in __French only__. This document consists in (i) a summary of the original paper of dp-GAN and (ii) a report on my implementation. Its PDF version has been precompiled, but run `./compile.sh` from `summary` if needed.
 * Directory `dpgan` contains the implementation of the project. See the report in `summary` or the docstrings of each files to understand it.
-* Directory `data` contains all relevant data for the use of the implemented neural networks.
+* Directory `data` contains all relevant data for the use of the implemented neural network.
 
 All other useful information can be found in `summary/summary.pdf`.
 
